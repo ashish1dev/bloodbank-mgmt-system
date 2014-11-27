@@ -41,7 +41,8 @@ if (loggedIn()) {
 										"</tr>";
 						
 				while($row = mysql_fetch_array($query)){
-				
+						//var_dump($row)	;
+						
 						$str="delete_record.php?username=".$row['username']."&user_or_request=user";
 						$response .="<tr>".
 									"<td>"."<a href='$str'"." onclick=\"return confirm('Are you sure you want to delete this item?');\">"."click to delete"."</a>".

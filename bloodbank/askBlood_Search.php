@@ -41,8 +41,13 @@ if (loggedIn()) {
 				if (mysql_num_rows($query)==0 ){
 					$response .= "No record found!";
 				} 
-				while($row = mysql_fetch_array($query,MYSQL_BOTH) ){
-					$response .= $row['username']."<BR/>";
+				elseif(mysql_num_rows($query)>0){
+					$response .= "<table>";
+					$response .= "<tr><td>Username</td><td>Join</td></tr>"; 
+					while($row = mysql_fetch_array($query,MYSQL_BOTH) ){
+						$response .= "<tr>"."<td>".$row['username']."</td>"."<td>"."<a href='join.php?to=".$row['username']."&typeOfMessage=ask'>Click To Join</a>"."</td>"."</tr>";
+					}
+					$response .= "</table>";
 				}
 				//
 			$sOutput .= $response;

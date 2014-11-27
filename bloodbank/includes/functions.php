@@ -76,6 +76,113 @@ function createAccount(	$pUsername, $pPassword,
 
 
 /***********
+	bool updateAccount (string $pUsername, string $pPassword)
+		Attempt to create an account for the passed in 
+		username and password.
+************/
+function updateAccount(	$pUsername, $pPassword,
+						$firstname,	$lastname,
+						$bloodtype,	$address,
+						$city,		$state,
+						$zipcode,	$phone) {
+	// First check we have data passed in.
+	
+	if (!empty($pUsername) && !empty($pPassword) ) {
+		$uLen = strlen($pUsername);
+		$pLen = strlen($pPassword);
+		
+		// escape the $pUsername to avoid SQL Injections
+		$eUsername = mysql_real_escape_string($pUsername);
+		
+		// Error checks (Should be explained with the error)
+		
+		//regular expression for email validation
+	    if (preg_match("/^([a-zA-Z0-9])+([a-zA-Z0-9\._-])*@([a-zA-Z0-9_-])+([a-zA-Z0-9\._-]+)+$/",
+            $eUsername)) {
+			if ($uLen <= 1) {
+				$_SESSION['error'] = "<font color='red'>E-Mail must not be blank.</font>";
+				return false;
+			}elseif ($pLen < 6) {
+				$_SESSION['error'] = "<font color='red'>Password must be longer then 6 characters.</font>";
+				return false;
+			}else {
+				// All errors passed lets
+				// Create our insert SQL by hashing the password and using the escaped Username.
+				$sql="UPDATE users SET username='".$eUsername."', password='".hashPassword($pPassword, SALT1, SALT2)."',
+									firstname='". 	$firstname 	."',
+									lastname='" .	$lastname	."',
+									bloodtype='".	$bloodtype	."',
+									address='"  .	$address	."',
+									city='"		.	$city		."',
+									state='"	.	$state		."',
+									zipcode='"	.	$zipcode	."',
+									phone='"	.	$phone		."' WHERE username='".$_SESSION['username']."'";
+									
+				
+
+				$query = mysql_query($sql) or trigger_error("Query Failed: " . mysql_error());
+			
+				if ($query) {
+					$_SESSION['username']=$eUsername;
+					$_SESSION['password']=$pPassword;
+					return true;
+				}
+			}
+        } else {
+            $_SESSION['error'] = "<font color='red'>Your EMail Address is invalid</font>  ";
+        	return false;
+        }
+	}
+	//echo "firstName = ".$firstname.", lastName=".$lastname.",bloodType=".$bloodtype.",address=".$address.",city=".$city.",state=".$state.",zipcode=".$zipcode.",phone=".$phone;
+	$_SESSION['error'] = "<font color='red'>Can't be blank</font>  ";
+	return false;
+}
+function sendMessage($from, $to,$msg) {
+	
+	// First check we have data passed in.
+	if (!empty($from) && !empty($to) && !empty($msg) ) {
+		
+		// Create our insert SQL by hashing the password and using the escaped Username.
+		$sql = "INSERT INTO message (_from, _to,msg) VALUES ('" . $from . "', '" . $to ."', '".$msg."')";
+		$query = mysql_query($sql) or trigger_error("Query Failed: " . mysql_error());
+
+		if ($query) {
+			return true;
+		}
+	}
+	
+	return false;
+}
+
+function decrementDonorCount($user){
+	if (!empty($user)) {
+		
+		$sql = "select numberOfDonorsRequired FROM AskBlood_Request WHERE username ='".$user."' LIMIT 1";
+		$query = mysql_query($sql) or trigger_error("Query Failed: " . mysql_error());
+		
+		if (!$query) {
+			echo 'Could not run query: ' . mysql_error();
+			return false;
+		}else{
+			$row = mysql_fetch_assoc($query);
+
+			$value= $row['numberOfDonorsRequired'];
+			$newValue=$value-1;
+			if ($value>0){
+				$sql = "UPDATE AskBlood_Request SET numberOfDonorsRequired= '".$newValue."' WHERE username ='".$user."'";
+				$query = mysql_query($sql) or trigger_error("Query Failed: " . mysql_error());
+
+				if ($query) {
+					return true;
+				}
+			}
+			return true;
+		}
+	}
+	return false;
+}
+
+/***********
 	string hashPassword (string $pPassword, string $pSalt1, string $pSalt2)
 		This will create a SHA1 hash of the password
 		using 2 salts that the user specifies.
@@ -131,6 +238,7 @@ function validateUser($pUsername, $pPassword) {
 		$row = mysql_fetch_assoc($query);
 		$_SESSION['username'] = $row['username'];
 		$_SESSION['bloodtype']=$row['bloodtype'];
+		$_SESSION['password']=$pPassword;
 		$_SESSION['city']=$row['city'];
 		$_SESSION['loggedin'] = true;
 		

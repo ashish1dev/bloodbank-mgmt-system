@@ -80,11 +80,13 @@ text-align:center
 <body>
 
 <ul>
+<b>Blood Donation Website (ADMIN)</b>
 <?php
 if (loggedIn()) {
 ?>
   <li><a href="list_users.php">List Users</a></li>
   <li><a href="list_requests.php">List Requests</a></li>
+  <li><a href='myInfo.php'>My Info</a></li>
   <li><a href="login.php?action=logout">Logout</a></li>
 <?php  
 }else{

@@ -8,7 +8,7 @@ ul {
     margin-top: 20;
     padding: 15;
     background-color:yellow;
-    width:50%;
+    width:90%;
 }
 body{
 margin:20;
@@ -79,16 +79,20 @@ text-align:center
 <body>
 
 <ul>
+<b>Blood Donation Website</b>
 <?php
+
 
 if (loggedIn()) {
 ?>
   	<!--<li><a href="index.php">Home</a></li>
   	-->
+  	
   	<li><a href='askBlood.php'>Ask Blood</a></li>
 	<li><a href='donateBlood.php'>Donate Blood</a></li>
 	<li><a href='inbox.php'>Inbox</a></li>
 	<li><a href='myRequest.php'>My Request</a></li>
+	<li><a href='myInfo.php'>My Info</a></li>
   	<li><a href="login.php?action=logout">Logout</a></li>
 <?php  
 }else{
